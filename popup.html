@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DSA Journal</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Navigation -->
+    <nav class="nav">
+      <button class="nav-btn active" data-view="today">Today</button>
+      <button class="nav-btn" data-view="weekly">Weekly</button>
+    </nav>
+
+    <!-- Today View -->
+    <div id="today-view" class="view active">
+      <div class="header">
+        <h1 id="current-date"></h1>
+        <button id="summarize-btn" class="btn-secondary">Summarize Day</button>
+      </div>
+
+      <!-- Daily Summary (if exists) -->
+      <div id="summary-section" class="summary-section hidden">
+        <h3>Daily Summary</h3>
+        <textarea id="summary-text" placeholder="Write your daily summary..."></textarea>
+        <button id="save-summary-btn" class="btn-primary">Save Summary</button>
+      </div>
+
+      <!-- Add Question Form -->
+      <div class="add-question">
+        <h3>Add Question</h3>
+        <form id="question-form">
+          <input type="text" id="q-title" placeholder="Problem Title *" required>
+          <input type="url" id="q-url" placeholder="Problem URL (optional)">
+          
+          <div class="form-row">
+            <select id="q-platform" required>
+              <option value="">Select Platform *</option>
+              <option value="LeetCode">LeetCode</option>
+              <option value="GFG">GeeksforGeeks</option>
+              <option value="Codeforces">Codeforces</option>
+              <option value="HackerRank">HackerRank</option>
+              <option value="Other">Other</option>
+            </select>
+            
+            <select id="q-topic" required>
+              <option value="">Select Topic *</option>
+              <option value="Array">Array</option>
+              <option value="String">String</option>
+              <option value="Linked List">Linked List</option>
+              <option value="Stack">Stack</option>
+              <option value="Queue">Queue</option>
+              <option value="Tree">Tree</option>
+              <option value="Graph">Graph</option>
+              <option value="DP">Dynamic Programming</option>
+              <option value="Greedy">Greedy</option>
+              <option value="Backtracking">Backtracking</option>
+              <option value="Math">Math</option>
+              <option value="Binary Search">Binary Search</option>
+              <option value="Sorting">Sorting</option>
+              <option value="Recursion">Recursion</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <select id="q-difficulty">
+              <option value="">Difficulty (optional)</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+            
+            <input type="number" id="q-time" placeholder="Time (mins)" min="1">
+          </div>
+
+          <textarea id="q-notes" placeholder="Notes: Approach, mistakes, insights..." rows="4"></textarea>
+          
+          <button type="submit" class="btn-primary">Add Question</button>
+        </form>
+      </div>
+
+      <!-- Questions List -->
+      <div id="questions-list" class="questions-list">
+        <h3>Questions Solved Today (<span id="today-count">0</span>)</h3>
+        <div id="questions-container"></div>
+      </div>
+    </div>
+
+    <!-- Weekly View -->
+    <div id="weekly-view" class="view">
+      <div class="header">
+        <h1>Weekly Overview</h1>
+      </div>
+      
+      <div id="weekly-stats" class="weekly-stats"></div>
+      <div id="weekly-days" class="weekly-days"></div>
+    </div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="summary.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
