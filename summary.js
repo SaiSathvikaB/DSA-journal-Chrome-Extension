@@ -1,75 +1,93 @@
-// Summary generation utilities
+// Summary generation utilities (Multi-Entry Support)
 const Summary = {
     // Generate auto summary for a day
-    generateDailySummary(questions) {
-      if (questions.length === 0) {
-        return "No questions solved today.";
+    generateDailySummary(entries) {
+      if (entries.length === 0) {
+        return "No learning entries today.";
       }
   
-      const totalProblems = questions.length;
-      const topics = this.getTopicDistribution(questions);
-      const platforms = this.getPlatformDistribution(questions);
-      const difficulties = this.getDifficultyDistribution(questions);
-      const totalTime = questions.reduce((sum, q) => sum + (parseInt(q.timeTaken) || 0), 0);
+      const byType = this.getEntriesByType(entries);
+      const dsaCount = byType.DSA?.length || 0;
+      const sqlCount = byType.SQL?.length || 0;
+      const techCount = byType.TECH?.length || 0;
   
-      let summary = `Solved ${totalProblems} problem${totalProblems > 1 ? 's' : ''} today.\n\n`;
+      let summary = "";
   
-      // Topics covered
-      if (Object.keys(topics).length > 0) {
-        summary += `Topics covered: ${Object.keys(topics).join(', ')}.\n`;
+      // DSA Summary
+      if (dsaCount > 0) {
+        const topics = this.getTopicsFromEntries(byType.DSA);
+        const difficulties = this.getDifficultyDistribution(byType.DSA);
+        const totalTime = byType.DSA.reduce((sum, e) => sum + (parseInt(e.timeTaken) || 0), 0);
+  
+        summary += `Solved ${dsaCount} DSA problem${dsaCount > 1 ? 's' : ''}`;
+        if (Object.keys(topics).length > 0) {
+          summary += ` (${Object.keys(topics).join(', ')})`;
+        }
+        summary += ". ";
+  
+        if (difficulties.Easy || difficulties.Medium || difficulties.Hard) {
+          const diffParts = [];
+          if (difficulties.Easy) diffParts.push(`${difficulties.Easy} Easy`);
+          if (difficulties.Medium) diffParts.push(`${difficulties.Medium} Medium`);
+          if (difficulties.Hard) diffParts.push(`${difficulties.Hard} Hard`);
+          summary += `Difficulty: ${diffParts.join(', ')}. `;
+        }
+  
+        if (totalTime > 0) {
+          summary += `Time spent: ${totalTime} minutes. `;
+        }
       }
   
-      // Difficulty breakdown
-      const difficultyText = [];
-      if (difficulties.Easy) difficultyText.push(`${difficulties.Easy} Easy`);
-      if (difficulties.Medium) difficultyText.push(`${difficulties.Medium} Medium`);
-      if (difficulties.Hard) difficultyText.push(`${difficulties.Hard} Hard`);
-      if (difficultyText.length > 0) {
-        summary += `Difficulty: ${difficultyText.join(', ')}.\n`;
+      // SQL Summary
+      if (sqlCount > 0) {
+        summary += `\n\nRevised ${sqlCount} SQL/DB topic${sqlCount > 1 ? 's' : ''}. `;
+        const sqlTitles = byType.SQL.map(e => e.title).slice(0, 3);
+        if (sqlTitles.length > 0) {
+          summary += `Topics: ${sqlTitles.join(', ')}${sqlCount > 3 ? ', ...' : ''}. `;
+        }
       }
   
-      // Time spent
-      if (totalTime > 0) {
-        summary += `Total time: ${totalTime} minutes.\n`;
+      // Tech Summary
+      if (techCount > 0) {
+        summary += `\n\nLearned ${techCount} tech concept${techCount > 1 ? 's' : ''}. `;
+        const techTitles = byType.TECH.map(e => e.title).slice(0, 3);
+        if (techTitles.length > 0) {
+          summary += `Topics: ${techTitles.join(', ')}${techCount > 3 ? ', ...' : ''}. `;
+        }
       }
   
-      // Most frequent topic
-      const topTopic = Object.entries(topics).sort((a, b) => b[1] - a[1])[0];
-      if (topTopic && topTopic[1] > 1) {
-        summary += `\nFocused mainly on ${topTopic[0]} (${topTopic[1]} problems).`;
-      }
-  
-      return summary;
+      return summary.trim();
     },
   
-    // Get topic distribution
-    getTopicDistribution(questions) {
+    // Get entries grouped by type
+    getEntriesByType(entries) {
+      const grouped = {};
+      entries.forEach(entry => {
+        if (!grouped[entry.type]) {
+          grouped[entry.type] = [];
+        }
+        grouped[entry.type].push(entry);
+      });
+      return grouped;
+    },
+  
+    // Get topics from DSA entries
+    getTopicsFromEntries(entries) {
       const topics = {};
-      questions.forEach(q => {
-        if (q.topic) {
-          topics[q.topic] = (topics[q.topic] || 0) + 1;
+      entries.forEach(e => {
+        if (e.topic) {
+          topics[e.topic] = (topics[e.topic] || 0) + 1;
         }
       });
       return topics;
     },
   
-    // Get platform distribution
-    getPlatformDistribution(questions) {
-      const platforms = {};
-      questions.forEach(q => {
-        if (q.platform) {
-          platforms[q.platform] = (platforms[q.platform] || 0) + 1;
-        }
-      });
-      return platforms;
-    },
-  
     // Get difficulty distribution
-    getDifficultyDistribution(questions) {
+    getDifficultyDistribution(entries) {
       const difficulties = {};
-      questions.forEach(q => {
-        if (q.difficulty) {
-          difficulties[q.difficulty] = (difficulties[q.difficulty] || 0) + 1;
+      entries.forEach(e => {
+        if (e.difficulty) {
+          difficulties[e.difficulty] = (difficulties[e.difficulty] || 0) + 1;
         }
       });
       return difficulties;
@@ -77,27 +95,37 @@ const Summary = {
   
     // Generate weekly stats
     generateWeeklyStats(weekDays) {
-      const allQuestions = weekDays.flatMap(day => day.data.questions);
-      const totalProblems = allQuestions.length;
-      const topics = this.getTopicDistribution(allQuestions);
-      const topicCount = Object.keys(topics).length;
+      const allEntries = weekDays.flatMap(day => day.data.entries);
+      const byType = this.getEntriesByType(allEntries);
+      
+      const dsaCount = byType.DSA?.length || 0;
+      const sqlCount = byType.SQL?.length || 0;
+      const techCount = byType.TECH?.length || 0;
+      const totalEntries = allEntries.length;
+  
+      // Get DSA topics
+      const dsaTopics = byType.DSA ? this.getTopicsFromEntries(byType.DSA) : {};
+      const topicCount = Object.keys(dsaTopics).length;
   
       // Find best day
       let bestDay = null;
-      let maxProblems = 0;
+      let maxEntries = 0;
       weekDays.forEach(day => {
-        const count = day.data.questions.length;
-        if (count > maxProblems) {
-          maxProblems = count;
+        const count = day.data.entries.length;
+        if (count > maxEntries) {
+          maxEntries = count;
           bestDay = day.date;
         }
       });
   
       return {
-        totalProblems,
+        totalEntries,
+        dsaCount,
+        sqlCount,
+        techCount,
         topicCount,
         bestDay: bestDay ? Storage.formatDateDisplay(bestDay) : 'N/A',
-        topics
+        byType
       };
     }
   };

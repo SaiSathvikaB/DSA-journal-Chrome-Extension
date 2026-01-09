@@ -1,4 +1,4 @@
-// Storage utilities for DSA Journal
+// Storage utilities for DSA Journal (Multi-Entry Support)
 const Storage = {
     // Get all data
     async getAll() {
@@ -12,7 +12,7 @@ const Storage = {
     // Get data for a specific date
     async getDay(dateStr) {
       const allData = await this.getAll();
-      return allData[dateStr] || { questions: [], summary: '' };
+      return allData[dateStr] || { entries: [], summary: '' };
     },
   
     // Save data for a specific date
@@ -26,20 +26,20 @@ const Storage = {
       });
     },
   
-    // Add a question to today
-    async addQuestion(dateStr, question) {
+    // Add an entry to today
+    async addEntry(dateStr, entry) {
       const dayData = await this.getDay(dateStr);
-      question.id = this.generateId();
-      question.timestamp = new Date().toISOString();
-      dayData.questions.push(question);
+      entry.id = this.generateId();
+      entry.timestamp = new Date().toISOString();
+      dayData.entries.push(entry);
       await this.saveDay(dateStr, dayData);
-      return question;
+      return entry;
     },
   
-    // Delete a question
-    async deleteQuestion(dateStr, questionId) {
+    // Delete an entry
+    async deleteEntry(dateStr, entryId) {
       const dayData = await this.getDay(dateStr);
-      dayData.questions = dayData.questions.filter(q => q.id !== questionId);
+      dayData.entries = dayData.entries.filter(e => e.id !== entryId);
       await this.saveDay(dateStr, dayData);
       return true;
     },
@@ -64,7 +64,7 @@ const Storage = {
         const dateStr = this.formatDate(date);
         days.push({
           date: dateStr,
-          data: allData[dateStr] || { questions: [], summary: '' }
+          data: allData[dateStr] || { entries: [], summary: '' }
         });
       }
       

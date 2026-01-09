@@ -28,15 +28,28 @@
         <button id="save-summary-btn" class="btn-primary">Save Summary</button>
       </div>
 
-      <!-- Add Question Form -->
-      <div class="add-question">
-        <h3>Add Question</h3>
-        <form id="question-form">
-          <input type="text" id="q-title" placeholder="Problem Title *" required>
-          <input type="url" id="q-url" placeholder="Problem URL (optional)">
+      <!-- Add Entry Form -->
+      <div class="add-entry">
+        <h3>Add Learning Entry</h3>
+        
+        <!-- Entry Type Selector -->
+        <div class="entry-type-selector">
+          <label for="entry-type">Entry Type:</label>
+          <select id="entry-type" required>
+            <option value="">Select type *</option>
+            <option value="DSA">🧠 DSA Problem</option>
+            <option value="SQL">🗄️ SQL / DB / Query</option>
+            <option value="TECH">⚙️ Tech Concept</option>
+          </select>
+        </div>
+
+        <!-- DSA Form -->
+        <form id="dsa-form" class="entry-form hidden">
+          <input type="text" id="dsa-title" placeholder="Problem Title *" required>
+          <input type="url" id="dsa-url" placeholder="Problem URL (optional)">
           
           <div class="form-row">
-            <select id="q-platform" required>
+            <select id="dsa-platform" required>
               <option value="">Select Platform *</option>
               <option value="LeetCode">LeetCode</option>
               <option value="GFG">GeeksforGeeks</option>
@@ -45,7 +58,7 @@
               <option value="Other">Other</option>
             </select>
             
-            <select id="q-topic" required>
+            <select id="dsa-topic" required>
               <option value="">Select Topic *</option>
               <option value="Array">Array</option>
               <option value="String">String</option>
@@ -66,26 +79,52 @@
           </div>
 
           <div class="form-row">
-            <select id="q-difficulty">
+            <select id="dsa-difficulty">
               <option value="">Difficulty (optional)</option>
               <option value="Easy">Easy</option>
               <option value="Medium">Medium</option>
               <option value="Hard">Hard</option>
             </select>
             
-            <input type="number" id="q-time" placeholder="Time (mins)" min="1">
+            <input type="number" id="dsa-time" placeholder="Time (mins)" min="1">
           </div>
 
-          <textarea id="q-notes" placeholder="Notes: Approach, mistakes, insights..." rows="4"></textarea>
+          <textarea id="dsa-notes" placeholder="Approach, mistakes, insights..." rows="4"></textarea>
           
-          <button type="submit" class="btn-primary">Add Question</button>
+          <button type="submit" class="btn-primary">Add Entry</button>
+        </form>
+
+        <!-- SQL Form -->
+        <form id="sql-form" class="entry-form hidden">
+          <input type="text" id="sql-title" placeholder="Topic Title (e.g., GROUP BY vs HAVING) *" required>
+          
+          <textarea id="sql-query" placeholder="SQL Query or Example..." rows="4"></textarea>
+          
+          <textarea id="sql-notes" placeholder="Explanation / Notes..." rows="3"></textarea>
+          
+          <textarea id="sql-mistake" placeholder="Mistake / Gotcha (optional)..." rows="2"></textarea>
+          
+          <button type="submit" class="btn-primary">Add Entry</button>
+        </form>
+
+        <!-- Tech Form -->
+        <form id="tech-form" class="entry-form hidden">
+          <input type="text" id="tech-title" placeholder="Concept Title (e.g., Database Indexing) *" required>
+          
+          <textarea id="tech-description" placeholder="Description / What I learned..." rows="4" required></textarea>
+          
+          <textarea id="tech-why" placeholder="Why it matters..." rows="2"></textarea>
+          
+          <textarea id="tech-stuck" placeholder="Where I got stuck (optional)..." rows="2"></textarea>
+          
+          <button type="submit" class="btn-primary">Add Entry</button>
         </form>
       </div>
 
-      <!-- Questions List -->
-      <div id="questions-list" class="questions-list">
-        <h3>Questions Solved Today (<span id="today-count">0</span>)</h3>
-        <div id="questions-container"></div>
+      <!-- Entries List -->
+      <div id="entries-list" class="entries-list">
+        <h3>Learning Entries Today (<span id="today-count">0</span>)</h3>
+        <div id="entries-container"></div>
       </div>
     </div>
 
